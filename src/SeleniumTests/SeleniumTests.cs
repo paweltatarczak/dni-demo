@@ -26,11 +26,10 @@ namespace SeleniumTests
         public void PageLive_Test()
         {
             _driver.Manage().Window.Maximize();
-            //_driver.Navigate().GoToUrl("http://agent:5000");
-            _driver.Navigate().GoToUrl("http://itsas.pl/devops/");
+            _driver.Navigate().GoToUrl("http://agent:5000");
             _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(2);
 
-            Assert.IsTrue(_driver.PageSource.Contains("The time on the server is "));
+            Assert.IsTrue(_driver.PageSource.Contains("Welcome"));
         }
     }
 }
