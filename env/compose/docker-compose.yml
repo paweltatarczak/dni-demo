@@ -1,0 +1,67 @@
+version: '3.9'
+
+services:
+    # Jenkins
+    jenkins:
+        container_name: jenkins
+        image: jenkins/jenkins:jdk11
+        ports:
+        - "8880:8080"
+        - "50000:50000"
+        volumes:
+        - /volumes/jenkins:/var/jenkins_home
+        networks:
+        - docker_network
+
+    # Jenkins Agent
+    agent:
+        container_name: agent
+        depends_on:
+        - jenkins
+        volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        build:
+            context: ../dockerfiles/agent
+        command: java -jar agent.jar -jnlpUrl http://jenkins:8080/computer/dotnecik/jenkins-agent.jnlp -secret 9132fecdd71c02c3f8db5bc7e11f9f72001894b726437ea5472d2a1c05594e6e -workDir "/home"
+        networks:
+        - docker_network
+
+    # SonarQube
+    sonarqube:
+        container_name: sonarqube
+        image: sonarqube:latest
+        ports:
+        - "9000:9000"
+        volumes:
+        - /volumes/sonarqube/data:/opt/sonarqube/data
+        - /volumes/sonarqube/logs:/opt/sonarqube/logs
+        - /volumes/sonarqube/extensions:/opt/sonarqube/extensions
+        environment:
+        - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+        networks:
+        - docker_network
+
+    # Selenium Hub
+    selenium_hub:
+        container_name: seleniumhub
+        image: selenium/hub
+        ports:
+        - "4444:4444"
+        networks:
+        - docker_network
+
+    # Selenium Firefox
+    selenium_firefox:
+        container_name: seleniumfirefox
+        image: selenium/node-firefox
+        depends_on:
+        - selenium_hub
+        environment:
+        - HUB_HOST=seleniumhub
+        - HUB_PORT=4444
+        networks:
+        - docker_network
+
+networks:
+    docker_network:
+        driver: bridge
