@@ -12,5 +12,5 @@ creating environment:
 * seleniumhub
 * selenium-firefox
 
-## testout
+## testout .
 example compiled webapp (created using 'dotnet new webapp -o aspnetcoreapp --no-https')
